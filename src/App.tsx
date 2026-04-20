@@ -3,7 +3,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
-import Navbar from './components/NavBar';
+import { Box, Button, Stack } from '@mui/material';
+import { NavLink, Outlet } from 'react-router';
 
 
 function App() {
@@ -11,10 +12,40 @@ function App() {
     <Container maxWidth="lg">
       <AppBar position="static">
         <Toolbar>
-          <Navbar />
           <Typography variant="h6">Fit Client Manager</Typography>
         </Toolbar>
       </AppBar>
+
+      {/** navigaatio*/}
+      <Box>
+        <Stack direction="row" justifyContent="center">
+          <NavLink
+            to="/customers"
+            end
+            style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <Button
+                sx={{ fontWeight: isActive ? "bold" : "normal" }}>
+                Customers</Button>
+            )}
+          </NavLink>
+
+          <NavLink
+            to="/trainings"
+            style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <Button
+                sx={{ fontWeight: isActive ? "bold" : "normal" }}>
+                Trainings</Button>
+            )}
+          </NavLink>
+
+        </Stack>
+      </Box>
+
+      <Outlet />
+
+
       <CssBaseline />
     </Container>
   )
