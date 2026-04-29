@@ -20,8 +20,18 @@ function App() {
       <Box>
         <Stack direction="row" justifyContent="center">
           <NavLink
-            to="/customers"
+            to="/"
             end
+            style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <Button
+                sx={{ fontWeight: isActive ? "bold" : "normal" }}>
+                Home</Button>
+            )}
+          </NavLink>
+
+          <NavLink
+            to="/customers"
             style={{ textDecoration: "none" }}>
             {({ isActive }) => (
               <Button
