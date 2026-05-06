@@ -5,7 +5,8 @@ import type { GridColDef } from '@mui/x-data-grid';
 
 
 // tyypitetään asiakkaasta haettavat tiedot
-type CustomerDataType = {
+export type CustomerDataType = {
+    id: number;
     firstname: string;
     lastname: string;
     email: string;
@@ -64,6 +65,8 @@ export default function Customers() {
                             },
                         },
                     }}
+                    // määritellään ettei rivejä pysty valitsemaan
+                    rowSelection={false}
                 />
             </div>
         </>
