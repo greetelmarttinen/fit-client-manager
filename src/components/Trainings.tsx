@@ -6,6 +6,9 @@ import type { GridColDef } from '@mui/x-data-grid';
 import dayjs from "dayjs";
 // määritellään aikavyöhykkeeksi suomen aika
 import "dayjs/locale/fi";
+import { fetchTrainings, deleteTraining } from "../trainingsapi";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
 
 
 // treeniohjelman tyypitys
@@ -23,11 +26,14 @@ export default function Trainings() {
     // harjoitusten tallnnus stateen
     const [trainingData, setTrainingData] = useState<TrainingsDataType[]>([]);
 
+    // alustetaan snackbarin stateksi aluksi false, niin se ei näy sivulla ennen poistotoimintoa
+    const [open, setOpen] = useState(false);
+
     // määritellään datagridissä näytettävä sisältö
     const columns: GridColDef[] = [
-        { field: "activity", headerName: "Activity", width: 300 },
+        { field: "activity", headerName: "Activity", width: 250 },
         {
-            field: "date", headerName: "Date", width: 300, valueFormatter: (params) => {
+            field: "date", headerName: "Date", width: 250, valueFormatter: (params) => {
                 return dayjs(params).format("DD.MM.YYYY HH:mm")
             }
         },
@@ -37,19 +43,47 @@ export default function Trainings() {
             // muotoillaan datanäkymä renderCellin avulla
             // customer -objektin sisällä oleva data ja näytetään tekstinä
             renderCell: (params) => params.row.customer ? `${params.row.customer.firstname} ${params.row.customer.lastname}` : ""
+        },
+        {   // harjoituksen poisto
+            field: "id",
+            headerName: "",
+            // tämän columnin mukaan ei ole mahdollista sortata tai filtteröidä rivejä
+            sortable: false,
+            filterable: false,
+            renderCell: (params: GridRenderCellParams) =>
+                <Button color="error" size="small" onClick={() => handleDelete(params.row.id)}>
+                    DELETE
+                </Button>
         }
     ];
 
-    // haetaan/fetchataan trainings dataa apista
-    useEffect(() => {
-        fetch('https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/gettrainings')
-            .then(response => {
-                if (!response.ok)
-                    throw new Error("Error in fetch: " + response.statusText);
-                return response.json();
-            })
-            .then(responseData => setTrainingData(responseData))
+    // harjoituksen poistaminen
+    const handleDelete = (id: number) => {
+        if (window.confirm("Are you sure that you want to delete this training?"))
+            deleteTraining(id)
+                .then(response => {
+                    if (!response.ok)
+                        throw new Error("Error when deleting training");
+                    return response.json();
+                })
+                // poiston jälkeen uusi get -pyyntö harjoituksille -> päivitetyt tiedot
+                .then(() => {
+                    getTrainings();
+                    setOpen(true);
+                })
+                .catch(err => console.error(err))
+    }
+
+    // haetaan trainings data
+    const getTrainings = () => {
+        fetchTrainings()
+            .then(data => setTrainingData(data))
             .catch(err => console.error(err))
+    }
+
+
+    useEffect(() => {
+        getTrainings();
     }, []);
 
     return (
@@ -75,6 +109,13 @@ export default function Trainings() {
                     rowSelection={false}
                 />
             </div>
+            <Snackbar
+                // ilmoitus onnistuneesta poistotoiminnosta
+                open={open}
+                autoHideDuration={3000}
+                onClose={() => setOpen(false)}
+                message="Training deleted successfully!"
+            />
         </>
     )
 }
