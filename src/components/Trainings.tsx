@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { Stack } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
-import { TrainingsDataType, CustomerDataType } from "../types";
+
+// treeniohjelman tyypitys
+type TrainingsDataType = {
+    id: number;
+    activity: string;
+    date: string;
+    duration: number;
+    customer: CustomerDataType;
+}
 
 
 export default function Trainings() {
