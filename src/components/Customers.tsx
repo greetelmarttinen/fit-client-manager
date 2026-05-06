@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Stack } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef } from '@mui/x-data-grid';
+import AddCustomer from "./AddCustomer";
+import { fetchCustomer, saveCustomer } from "../customerapi";
 
 
 // tyypitetään asiakkaasta haettavat tiedot
 export type CustomerDataType = {
-    id: number;
+    id?: number;
     firstname: string;
     lastname: string;
     email: string;
@@ -14,6 +16,14 @@ export type CustomerDataType = {
     streetaddress: string;
     postcode: string;
     city: string;
+    _links: {
+        self: {
+            href: string;
+        }
+        customer: {
+            href: string;
+        }
+    }
 }
 
 export default function Customers() {
@@ -29,29 +39,39 @@ export default function Customers() {
         { field: "phone", headerName: "Phone number", width: 150 },
         { field: "streetaddress", headerName: "Street address", width: 220 },
         { field: "postcode", headerName: "Postcode", width: 100 },
-        { field: "city", headerName: "City", width: 100 },
+        { field: "city", headerName: "City", width: 100 }
     ]
 
 
-    {/** tehdään api-pyyntö useEffect hookin sisällä, jotta pyyntö lähetetään vain ensimmäisen renderöinnin aikana */ }
+    // haetaan asiakkaat
+    const getCustomers = () => {
+        fetchCustomer()
+            .then(data => setCustomerData(data._embedded.customers))
+            .catch(err => console.error(err));
+    }
+
+    //  tehdään api-pyyntö useEffect hookin sisällä, jotta pyyntö lähetetään vain ensimmäisen renderöinnin aikana 
     useEffect(() => {
-        {/** fetchataan/haetaan data */ }
-        fetch('https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers')
-            .then(response => {
-                if (!response.ok)
-                    throw new Error("Error in fetch: " + response.statusText);
-                return response.json();
-            })
-            .then(responseData => setCustomerData(responseData._embedded.customers))
-            .catch(err => console.error(err))
+        getCustomers();
     }, []);
+
+
+    // uuden asiakkaan lisäys -nappi
+    const handleAdd = (customer: CustomerDataType) => {
+        saveCustomer(customer)
+            // haetaan uudet tiedot bäkkäristä
+            .then(() => getCustomers())
+            .catch(err => console.error(err))
+    };
 
     return (
         <>
-            <Stack>
-                <h3>Customers</h3>
+            <h3>Customers</h3>
+            <Stack sx={{ mb: 2 }} direction="row">
+                {/** uuden asiakkaan lisäys -nappi */}
+                <AddCustomer handleAdd={handleAdd} />
             </Stack>
-            <div>
+            <div style={{ width: "100%", height: 500, margin: "auto" }}>
                 <DataGrid
                     columns={columns}
                     rows={customerData}
@@ -61,10 +81,11 @@ export default function Customers() {
                     initialState={{
                         pagination: {
                             paginationModel: {
-                                pageSize: 7,
+                                pageSize: 5,
                             },
                         },
                     }}
+                    pageSizeOptions={[5]}
                     // määritellään ettei rivejä pysty valitsemaan
                     rowSelection={false}
                 />
