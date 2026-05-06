@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
 import { Stack } from "@mui/material";
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { CustomerDataType } from "../types";
+import { DataGrid } from '@mui/x-data-grid';
+import type { GridColDef } from '@mui/x-data-grid';
+
+
+// tyypitetään asiakkaasta haettavat tiedot
+type CustomerDataType = {
+    firstname: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    streetaddress: string;
+    postcode: string;
+    city: string;
+}
 
 export default function Customers() {
 
@@ -10,10 +22,13 @@ export default function Customers() {
 
     {/** määritellään taulukon / datagridin sisältö */ }
     const columns: GridColDef[] = [
-        { field: "firstname", headerName: "Firstname", width: 250 },
-        { field: "lastname", headerName: "Lastname", width: 250 },
-        { field: "email", headerName: "Email", width: 250 },
-        { field: "phone", headerName: "Phone number", width: 250 }
+        { field: "firstname", headerName: "Firstname", width: 150 },
+        { field: "lastname", headerName: "Lastname", width: 150 },
+        { field: "email", headerName: "Email", width: 200 },
+        { field: "phone", headerName: "Phone number", width: 150 },
+        { field: "streetaddress", headerName: "Street address", width: 220 },
+        { field: "postcode", headerName: "Postcode", width: 100 },
+        { field: "city", headerName: "City", width: 100 },
     ]
 
 
@@ -41,6 +56,14 @@ export default function Customers() {
                     rows={customerData}
                     // määritellään riville uniikki id
                     getRowId={row => row._links.self.href}
+                    // asetetaan oletusnäkymäksi 7 asiakasta per sivu
+                    initialState={{
+                        pagination: {
+                            paginationModel: {
+                                pageSize: 7,
+                            },
+                        },
+                    }}
                 />
             </div>
         </>
