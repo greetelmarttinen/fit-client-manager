@@ -45,7 +45,7 @@ export default function Customers() {
         { field: "streetaddress", headerName: "Street address", width: 220 },
         { field: "postcode", headerName: "Postcode", width: 100 },
         { field: "city", headerName: "City", width: 100 },
-        // asiakastietojen muokkaus
+        // asiakastietojen poisto
         {
             field: "_links.self.href",
             headerName: "",
@@ -58,7 +58,7 @@ export default function Customers() {
                 </Button>
         }
 
-        // asiakastietojen poisto
+        // asiakastietojen muokkaus
     ]
 
 
