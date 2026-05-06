@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { Stack } from "@mui/material";
-import { DataGrid } from '@mui/x-data-grid';
-
-
-{/** tyypitetään asiakkaasta haettava data, mikä näytetään UI:ssa */ }
-type CustomerDataType = {
-    firstname: string;
-    lastname: string;
-    email: string;
-    phone: string;
-}
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { CustomerDataType } from "../types";
 
 export default function Customers() {
 
