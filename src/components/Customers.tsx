@@ -3,9 +3,10 @@ import { Stack } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import AddCustomer from "./AddCustomer";
-import { fetchCustomer, saveCustomer } from "../customerapi";
+import { fetchCustomer, saveCustomer, updateCustomer } from "../customerapi";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
+import EditCustomer from "./EditCustomer";
 
 
 // tyypitetään asiakkaasta haettavat tiedot
@@ -38,13 +39,24 @@ export default function Customers() {
 
     {/** määritellään taulukon / datagridin sisältö */ }
     const columns: GridColDef[] = [
-        { field: "firstname", headerName: "Firstname", width: 150 },
-        { field: "lastname", headerName: "Lastname", width: 150 },
-        { field: "email", headerName: "Email", width: 200 },
+        { field: "firstname", headerName: "Firstname", width: 120 },
+        { field: "lastname", headerName: "Lastname", width: 120 },
+        { field: "email", headerName: "Email", width: 180 },
         { field: "phone", headerName: "Phone number", width: 150 },
-        { field: "streetaddress", headerName: "Street address", width: 220 },
+        { field: "streetaddress", headerName: "Street address", width: 180 },
         { field: "postcode", headerName: "Postcode", width: 100 },
         { field: "city", headerName: "City", width: 100 },
+        // asiakastietojen muokkaus
+        {
+            field: "_links.customer.href",
+            headerName: "",
+            sortable: false,
+            disableColumnMenu: false,
+            renderCell: (params: GridRenderCellParams) =>
+                <EditCustomer
+                    customer={params.row} handleUpdate={handleUpdate} />
+        },
+
         // asiakastietojen poisto
         {
             field: "_links.self.href",
@@ -58,7 +70,7 @@ export default function Customers() {
                 </Button>
         }
 
-        // asiakastietojen muokkaus
+
     ]
 
 
@@ -69,10 +81,7 @@ export default function Customers() {
             .catch(err => console.error(err));
     }
 
-    //  tehdään api-pyyntö useEffect hookin sisällä, jotta pyyntö lähetetään vain ensimmäisen renderöinnin aikana 
-    useEffect(() => {
-        getCustomers();
-    }, []);
+
 
 
     // uuden asiakkaan lisäys -nappi
@@ -82,6 +91,13 @@ export default function Customers() {
             .then(() => getCustomers())
             .catch(err => console.error(err))
     };
+
+    // tietojen muokkaus
+    const handleUpdate = (url: string, customer: CustomerDataType) => {
+        updateCustomer(url, customer)
+            .then(() => getCustomers())
+            .catch(err => console.error(err))
+    }
 
     // asiakkaan poistaminen
     const handleDelete = (url: string) => {
@@ -103,6 +119,11 @@ export default function Customers() {
         }
     }
 
+    //  tehdään api-pyyntö useEffect hookin sisällä, jotta pyyntö lähetetään vain ensimmäisen renderöinnin aikana 
+    useEffect(() => {
+        getCustomers();
+    }, []);
+
     return (
         <>
             <h3>Customers</h3>
@@ -120,7 +141,7 @@ export default function Customers() {
                     initialState={{
                         pagination: {
                             paginationModel: {
-                                pageSize: 5,
+                                pageSize: 7,
                             },
                         },
                     }}
