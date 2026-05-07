@@ -7,6 +7,8 @@ import { fetchCustomer, saveCustomer, updateCustomer } from "../customerapi";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import EditCustomer from "./EditCustomer";
+import { saveTraining } from "../trainingsapi";
+import AddTraining from "./AddTraining";
 
 
 // tyypitetään asiakkaasta haettavat tiedot
@@ -39,17 +41,31 @@ export default function Customers() {
 
     {/** määritellään taulukon / datagridin sisältö */ }
     const columns: GridColDef[] = [
-        { field: "firstname", headerName: "Firstname", width: 120 },
-        { field: "lastname", headerName: "Lastname", width: 120 },
-        { field: "email", headerName: "Email", width: 180 },
+        // asiakkaalle treenin lisäys
+        {
+            field: "addtraining",
+            headerName: "",
+            width: 160,
+            sortable: false,
+            filterable: false,
+            renderCell: (params: GridRenderCellParams) =>
+                <AddTraining
+                    customer={params.row}
+                    handleAddTraining={handleAddTraining} />
+
+        },
+        { field: "firstname", headerName: "Firstname", width: 100 },
+        { field: "lastname", headerName: "Lastname", width: 100 },
+        { field: "email", headerName: "Email", width: 150 },
         { field: "phone", headerName: "Phone number", width: 150 },
-        { field: "streetaddress", headerName: "Street address", width: 180 },
-        { field: "postcode", headerName: "Postcode", width: 100 },
-        { field: "city", headerName: "City", width: 100 },
+        { field: "streetaddress", headerName: "Street address", width: 150 },
+        { field: "postcode", headerName: "Postcode", width: 80 },
+        { field: "city", headerName: "City", width: 80 },
         // asiakastietojen muokkaus
         {
             field: "_links.customer.href",
             headerName: "",
+            width: 85,
             sortable: false,
             disableColumnMenu: false,
             renderCell: (params: GridRenderCellParams) =>
@@ -61,6 +77,7 @@ export default function Customers() {
         {
             field: "_links.self.href",
             headerName: "",
+            width: 85,
             // tämän columnin mukaan ei ole mahdollista sortata tai filtteröidä rivejä
             sortable: false,
             filterable: false,
@@ -81,7 +98,12 @@ export default function Customers() {
             .catch(err => console.error(err));
     }
 
-
+    // uuden treenin lisäys asiakkaalle
+    const handleAddTraining = (training) => {
+        saveTraining(training)
+            .then(() => console.log("Training added"))
+            .catch(err => console.error(err));
+    }
 
 
     // uuden asiakkaan lisäys -nappi
@@ -119,6 +141,8 @@ export default function Customers() {
         }
     }
 
+
+
     //  tehdään api-pyyntö useEffect hookin sisällä, jotta pyyntö lähetetään vain ensimmäisen renderöinnin aikana 
     useEffect(() => {
         getCustomers();
@@ -145,7 +169,7 @@ export default function Customers() {
                             },
                         },
                     }}
-                    pageSizeOptions={[5]}
+                    pageSizeOptions={[7]}
                     // määritellään ettei rivejä pysty valitsemaan
                     rowSelection={false}
                 />
